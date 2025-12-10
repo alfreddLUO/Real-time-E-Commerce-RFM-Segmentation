@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enterprise RFM Analytics Platform</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --bg-color: #f4f7fe;
+            --card-bg: #ffffff;
+            --primary: #4318ff;
+            --secondary: #6ad2ff;
+            --text-main: #2b3674;
+            --text-sub: #a3aed0;
+            --success: #05cd99;
+        }
+
+        body { font-family: 'DM Sans', sans-serif; background-color: var(--bg-color); margin: 0; padding: 20px; color: var(--text-main); }
+
+        /* Layout Grid */
+        .container { max-width: 1400px; margin: 0 auto; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+        .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 20px; }
+        .grid-main { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; }
+
+        /* Header */
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .header h1 { margin: 0; font-size: 28px; font-weight: 700; }
+        .status-badge { background: white; padding: 8px 16px; border-radius: 30px; font-size: 13px; font-weight: 600; color: var(--success); box-shadow: 0 3px 10px rgba(0,0,0,0.03); display: flex; align-items: center; gap: 8px; }
+        .pulse { width: 8px; height: 8px; background: var(--success); border-radius: 50%; animation: pulse 2s infinite; }
+
+        /* KPI Cards */
+        .kpi-card { background: var(--card-bg); padding: 20px; border-radius: 15px; display: flex; align-items: center; gap: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.02); }
+        .kpi-icon { width: 50px; height: 50px; border-radius: 50%; background: #f4f7fe; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+        .kpi-info h3 { margin: 0; font-size: 14px; color: var(--text-sub); font-weight: 500; }
+        .kpi-info h2 { margin: 5px 0 0; font-size: 24px; font-weight: 700; }
+
+        /* General Card */
+        .card { background: var(--card-bg); border-radius: 15px; padding: 25px; box-shadow: 0 5px 15px rgba(0,0,0,0.02); height: 100%; box-sizing: border-box; }
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .card-title { font-size: 18px; font-weight: 700; margin: 0; }
+
+        /* Tables */
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; color: var(--text-sub); font-size: 12px; font-weight: 500; padding-bottom: 15px; border-bottom: 1px solid #f0f0f0; }
+        td { padding: 15px 0; font-size: 14px; font-weight: 600; border-bottom: 1px solid #f0f0f0; }
+
+        /* Tags */
+        .tag { padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 700; text-transform: uppercase; }
+        .tag-0 { background: #ffebee; color: #d32f2f; } /* Risk */
+        .tag-1 { background: #e8f5e9; color: #388e3c; } /* Loyal */
+        .tag-2 { background: #e3f2fd; color: #1976d2; } /* New */
+        .tag-3 { background: #fff8e1; color: #fbc02d; } /* VIP */
+
+        /* Realtime Feed */
+        .feed-list { list-style: none; padding: 0; margin: 0; height: 300px; overflow: hidden; position: relative; }
+        .feed-item { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px dashed #eee; animation: slideIn 0.5s ease; }
+        .feed-time { font-size: 12px; color: var(--text-sub); }
+        .feed-amt { color: var(--success); font-weight: bold; }
+
+        /* Inputs */
+        .search-box { display: flex; gap: 10px; background: #f4f7fe; padding: 10px; border-radius: 10px; margin-bottom: 15px; }
+        .search-box input { border: none; background: transparent; outline: none; flex: 1; font-weight: 600; }
+        .btn-primary { background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.2s; }
+        .btn-primary:hover { opacity: 0.9; }
+
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(5, 205, 153, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(5, 205, 153, 0); } 100% { box-shadow: 0 0 0 0 rgba(5, 205, 153, 0); } }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <div>
+            <h1>RFM Intelligence Dashboard</h1>
+            <p style="color: var(--text-sub); margin: 5px 0 0;">Lambda Architecture: Spark (Batch) + Kafka (Speed) + Hive (Serving)</p>
+        </div>
+        <div style="display: flex; gap: 10px;">
+            <div class="status-badge"><div class="pulse"></div> Spark Streaming Active</div>
+            <div class="status-badge"><div class="pulse"></div> Hive Metastore Connected</div>
+        </div>
+    </div>
+
+    <div class="grid-3">
+        <div class="kpi-card">
+            <div class="kpi-icon">👥</div>
+            <div class="kpi-info">
+                <h3>Total Customers Processed</h3>
+                <h2 id="kpi-total">Loading...</h2>
+            </div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-icon">💰</div>
+            <div class="kpi-info">
+                <h3>Avg. Platform CLV</h3>
+                <h2 id="kpi-clv">Loading...</h2>
+            </div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-icon">⚡</div>
+            <div class="kpi-info">
+                <h3>Real-time Events (1h)</h3>
+                <h2>2,450+</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid-2">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Customer Segmentation (Distribution)</h3>
+            </div>
+            <div style="height: 250px; position: relative;">
+                <canvas id="distributionChart"></canvas>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Value Analysis (Avg Monetary by Cluster)</h3>
+            </div>
+            <div style="height: 250px; position: relative;">
+                <canvas id="valueChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid-main">
+
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Batch Layer Results (Hive)</h3>
+            </div>
+            <table id="batch-table">
+                <thead>
+                <tr>
+                    <th>Cluster ID</th>
+                    <th>Segment Name</th>
+                    <th>User Count</th>
+                    <th>Recency</th>
+                    <th>Frequency</th>
+                    <th>Monetary</th>
+                </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 20px;">
+
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Real-time Lookup</h3>
+                </div>
+                <div class="search-box">
+                    <input type="number" id="customerId" value="12347" placeholder="Cust ID">
+                    <input type="number" id="orderValue" value="150" placeholder="Amount">
+                </div>
+                <button class="btn-primary" style="width: 100%; margin-bottom: 15px;" onclick="fetchRealtimeSegment()">Analyze Customer</button>
+                <div id="lookup-result" style="display:none; padding: 15px; background: #f4f7fe; border-radius: 10px;">
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Live Kafka Stream</h3>
+                    <span style="font-size: 12px; color: var(--success);">● Live</span>
+                </div>
+                <ul class="feed-list" id="feed-list">
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Global Data Storage
+    let batchData = [];
+
+    document.addEventListener('DOMContentLoaded', () => {
+        initDashboard();
+        startLiveFeed();
+    });
+
+    async function initDashboard() {
+        try {
+            const res = await fetch('/api/batch_summary');
+            const json = await res.json();
+
+            if(json.status === 'ok') {
+                batchData = json.data;
+                updateKPIs(batchData);
+                renderCharts(batchData);
+                renderTable(batchData);
+            }
+        } catch (e) { console.error("Dashboard Init Error", e); }
+    }
+
+    // 1. Update Top KPIs
+    function updateKPIs(data) {
+        const totalUsers = data.reduce((acc, curr) => acc + curr.TotalCustomers, 0);
+        // Calculate weighted avg monetary
+        let totalVal = 0;
+        data.forEach(d => totalVal += (d.AvgMonetary * d.TotalCustomers));
+        const avgCLV = (totalVal / totalUsers).toFixed(2);
+
+        document.getElementById('kpi-total').innerText = totalUsers.toLocaleString();
+        document.getElementById('kpi-clv').innerText = '$' + avgCLV;
+    }
+
+    // 2. Render Charts using Chart.js
+    function renderCharts(data) {
+        // Prepare Data
+        const labels = data.map(d => `Cluster ${d.SegmentID}`);
+        const counts = data.map(d => d.TotalCustomers);
+        const monetary = data.map(d => d.AvgMonetary);
+        const colors = ['#d32f2f', '#388e3c', '#1976d2', '#fbc02d']; // Matches tags
+
+        // Chart 1: Doughnut
+        new Chart(document.getElementById('distributionChart'), {
+            type: 'doughnut',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: counts,
+                    backgroundColor: colors,
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'right' }
+                }
+            }
+        });
+
+        // Chart 2: Bar
+        new Chart(document.getElementById('valueChart'), {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Avg Monetary ($)',
+                    data: monetary,
+                    backgroundColor: '#4318ff',
+                    borderRadius: 5
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: { beginAtZero: true, grid: { display: false } },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
+    }
+
+    // 3. Render Table
+    function renderTable(data) {
+        const tbody = document.querySelector('#batch-table tbody');
+        tbody.innerHTML = '';
+        data.forEach(row => {
+            tbody.innerHTML += `
+                <tr>
+                    <td><span class="tag tag-${row.SegmentID}">ID ${row.SegmentID}</span></td>
+                    <td>${row.Description}</td>
+                    <td>${row.TotalCustomers.toLocaleString()}</td>
+                    <td>${row.AvgRecency} days</td>
+                    <td>${row.AvgFrequency}</td>
+                    <td>$${row.AvgMonetary}</td>
+                </tr>
+            `;
+        });
+    }
+
+    // 4. Real-time Lookup
+    async function fetchRealtimeSegment() {
+        const id = document.getElementById('customerId').value;
+        const val = document.getElementById('orderValue').value;
+        const box = document.getElementById('lookup-result');
+
+        box.style.display = 'block';
+        box.innerHTML = '⚡ Querying Serving Layer...';
+
+        try {
+            const res = await fetch(`/api/realtime_segment?customer_id=${id}&order_value=${val}`);
+            const json = await res.json();
+            const d = json.data;
+
+            box.innerHTML = `
+                <div style="display:flex; justify-content:space-between; align-items:center">
+                    <div>
+                        <div style="font-size:12px; color:#888;">Customer</div>
+                        <div style="font-weight:bold; font-size:16px;">#${d.CustomerID}</div>
+                    </div>
+                    <div style="text-align:right">
+                        <span class="tag tag-${d.SegmentID}">${d.SegmentDescription}</span>
+                    </div>
+                </div>
+                <div style="margin-top:10px; font-size:12px; color:var(--text-sub);">
+                    System identified this user based on batch history + current order of $${d.NewOrderValue}.
+                </div>
+            `;
+        } catch(e) { console.error(e); }
+    }
+
+    // 5. Live Feed Simulation
+    function startLiveFeed() {
+        const list = document.getElementById('feed-list');
+        const ids = [12347, 12583, 17850, 15502, 12345, 18239, 14201];
+
+        setInterval(() => {
+            const id = ids[Math.floor(Math.random() * ids.length)];
+            const amt = (Math.random() * 200).toFixed(2);
+            const seg = Math.floor(Math.random() * 4);
+
+            const li = document.createElement('li');
+            li.className = 'feed-item';
+            li.innerHTML = `
+                <div>
+                    <span style="font-weight:bold; font-size:13px;">Cust #${id}</span><br>
+                    <span class="feed-time">Kafka Ingestion</span>
+                </div>
+                <div style="text-align:right">
+                    <div class="feed-amt">+$${amt}</div>
+                    <span class="tag tag-${seg}" style="font-size:9px; padding:2px 5px;">C${seg}</span>
+                </div>
+            `;
+            list.prepend(li);
+            if(list.children.length > 5) list.removeChild(list.lastChild);
+        }, 1200);
+    }
+</script>
+
+</body>
+</html>

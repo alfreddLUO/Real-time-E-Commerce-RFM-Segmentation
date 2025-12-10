@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="PublishConfigData" serverName="mpcs53014-2025" remoteFilesAllowedToDisappearOnAutoupload="false">
+    <serverData>
+      <paths name="mpcs53014-2025">
+        <serverdata>
+          <mappings>
+            <mapping deploy="./" local="$PROJECT_DIR$" web="/" />
+          </mappings>
+        </serverdata>
+      </paths>
+    </serverData>
+  </component>
+</project>
