@@ -4,6 +4,7 @@
 **Course:** MPCS 53014 - Big Data Application Architecture
 **Date:** December 2025
 
+# Link to demo: https://drive.google.com/file/d/1tx_nVF-E4vg5XuAlc7iCzhdzSyU5_wac/view?usp=sharing
 ## 📖 0. Dataset Background & Processing Objectives
 
 ### 📊 The Dataset
@@ -77,11 +78,11 @@ peiyuanluo_final_project/
 
 
 ## 3. Architecture & Tech Stack
-* Compute: Apache Spark 
+* Compute: Apache Spark
 
 * Storage: HDFS (Raw Data), Apache Hive (Data Warehouse)
 
-* Messaging: AWS MSK (Managed Streaming for Kafka) 
+* Messaging: AWS MSK (Managed Streaming for Kafka)
 
 * Web: Node.js, Express, PM2
 
