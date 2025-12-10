@@ -4,6 +4,8 @@
 **Course:** MPCS 53014 - Big Data Application Architecture
 **Date:** December 2025
 
+# Git Link: https://github.com/alfreddLUO/Real-time-E-Commerce-RFM-Segmentation
+
 # Link to demo: https://drive.google.com/file/d/1tx_nVF-E4vg5XuAlc7iCzhdzSyU5_wac/view?usp=sharing
 
 # Web Link: http://ec2-52-20-203-80.compute-1.amazonaws.com:3034/
